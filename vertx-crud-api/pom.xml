@@ -12,6 +12,7 @@
     <properties>
         <!-- Define Vert.x version -->
         <vertx.version>4.2.4</vertx.version>
+        <netty.version>4.1.70.Final</netty.version>
         <!-- Define PostgreSQL version -->
         <postgresql.version>42.2.23</postgresql.version>
     </properties>
@@ -39,6 +40,82 @@
             <artifactId>postgresql</artifactId>
             <version>42.2.23</version>
         </dependency>
+
+        <dependency>
+            <groupId>io.vertx</groupId>
+            <artifactId>vertx-web-validation</artifactId>
+            <version>4.5.7</version>
+        </dependency>
+        <dependency>
+			 <groupId>io.vertx</groupId>
+			 <artifactId>vertx-web-client</artifactId>
+			 <version>4.5.7</version>
+		</dependency>
+		
+		
+		
+		<dependency>
+			 <groupId>io.vertx</groupId>
+			 <artifactId>vertx-codegen</artifactId>
+			 <version>4.5.7</version>
+			 <classifier>processor</classifier>
+		</dependency>
+		<dependency>
+			 <groupId>io.vertx</groupId>
+			 <artifactId>vertx-web-api-service</artifactId>
+			 <version>4.5.7</version>
+		</dependency>
+
+		<dependency>
+			 <groupId>io.vertx</groupId>
+			 <artifactId>vertx-web-proxy</artifactId>
+			 <version>4.5.7</version>
+		</dependency>
+
+		<dependency>
+			 <groupId>io.vertx</groupId>
+			 <artifactId>vertx-web-graphql</artifactId>
+			 <version>4.5.7</version>
+		</dependency>
+
+		        
+        <dependency>
+            <groupId>io.netty</groupId>
+            <artifactId>netty-codec</artifactId>
+            <version>4.1.68.Final</version>
+        </dependency>
+
+        <dependency>
+            <groupId>io.netty</groupId>
+            <artifactId>netty-handler-proxy</artifactId>
+            <version>4.1.68.Final</version>
+        </dependency>
+
+        <dependency>
+            <groupId>io.netty</groupId>
+            <artifactId>netty-codec-socks</artifactId>
+            <version>4.1.68.Final</version>
+        </dependency>
+
+        <dependency>
+            <groupId>io.netty</groupId>
+            <artifactId>netty-codec-http</artifactId>
+            <version>4.1.68.Final</version>
+        </dependency>
+
+        <dependency>
+            <groupId>io.netty</groupId>
+            <artifactId>netty-codec-http2</artifactId>
+            <version>4.1.68.Final</version>
+        </dependency>
+
+        <dependency>
+            <groupId>io.netty</groupId>
+            <artifactId>netty-resolver-dns</artifactId>
+            <version>4.1.68.Final</version>
+        </dependency>
+
+        
     </dependencies>
     
     <build>
@@ -53,22 +130,27 @@
                     <target>1.8</target>
                 </configuration>
             </plugin>
-            <!-- Other plugins if any -->
-	        <plugin>
-	            <groupId>org.apache.maven.plugins</groupId>
-	            <artifactId>maven-jar-plugin</artifactId>
-	            <version>3.2.0</version>
-	            <configuration>
-	                <archive>
-	                    <manifest>
-	                        <!-- <mainClass>fully.qualified.MainClass</mainClass> -->
-                             <mainClass>com.example.MainVerticle</mainClass>
-	                    </manifest>
-	                </archive>
-	            </configuration>
-	        </plugin>
-	    </plugins>
-	</build>
-
-
+            <!-- Maven Shade Plugin Configuration -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-shade-plugin</artifactId>
+                <version>3.2.4</version>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>shade</goal>
+                        </goals>
+                        <configuration>
+                            <transformers>
+                                <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+                                    <mainClass>com.example.MainVerticle</mainClass>
+                                </transformer>
+                            </transformers>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
 </project>

@@ -1,6 +1,6 @@
 # Vert.x CRUD API Project
 
-This project implements a simple CRUD API using Vert.x, PostgreSQL, and Maven.
+This project demonstrates a simple CRUD (Create, Read, Update, Delete) API implementation using Vert.x, a reactive toolkit for building reactive applications on the JVM.
 
 ## Project Structure
 ```bash
@@ -34,23 +34,48 @@ vertx-crud-api/
 ```
 
 
-## How to Run
+## Overview
 
-1. Make sure you have PostgreSQL installed and running.
-2. Update the database connection settings in `src/main/resources/application.properties`.
-3. Build the project using Maven:
-```bash 
+The project consists of the following components:
+
+- **MainVerticle**: Main entry point for the Vert.x application. Deploys HTTP and Database verticles.
+- **HttpVerticle**: Verticle responsible for handling HTTP requests and routing them to appropriate handlers.
+- **DatabaseVerticle**: Verticle responsible for managing database operations and communication with the database service.
+- **DatabaseService**: Service class managing database interactions for CRUD operations on the user entity.
+
+## Setup
+
+To run the application locally, follow these steps:
+
+1. **Prerequisites**: Ensure you have Java Development Kit (JDK) 8 or higher installed on your system.
+2. **Database Setup**: 
+   - Install PostgreSQL and create a database named `user_info`.
+   - Update the database connection settings in the `application.properties` file.
+3. **Building the Project**:
+```bash
 mvn clean package
 ```
-4. Run the JAR file generated in the `target` directory:
+
+4. **Running the Application**:
 ```bash
-java -jar target/vertx-crud-api-0.0.1-SNAPSHOT.jar
+java -jar target/vertx.jar
 ```
 
-## Endpoints
+5. **Accessing the API**: 
+- Once the application is running, you can access the API using `http://localhost:8080/api/users`.
 
-- `POST /api/users`: Create a new user.
-- `GET /api/users`: Retrieve all users or filter by query parameters (`name`, `gender`, `status`).
-- `PUT /api/users/{id}`: Update an existing user.
-- `DELETE /api/users/{id}`: Delete a user by ID.
 
+
+## API Endpoints
+
+- **POST /api/users**: Create a new user.
+- **GET /api/users**: Retrieve all users or filter by query parameters (name, gender, status).
+- **PUT /api/users/:id**: Update an existing user.
+- **DELETE /api/users/:id**: Delete a user by ID.
+
+## Dependencies
+
+- **Vert.x Core**: Reactive core for building reactive applications.
+- **Vert.x Web**: Web routing and handling support for Vert.x applications.
+- **Vert.x JDBC Client**: Asynchronous JDBC client for database access.
+- **PostgreSQL Driver**: JDBC driver for PostgreSQL database.

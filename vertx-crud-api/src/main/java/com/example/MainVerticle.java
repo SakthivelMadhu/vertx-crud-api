@@ -1,15 +1,16 @@
+
+
 package com.example;
 
+import io.vertx.core.Vertx;
 import com.example.database.DatabaseVerticle;
 
 import com.example.http.HttpVerticle;
-import io.vertx.core.AbstractVerticle;
-import io.vertx.core.Promise;
 
-public class MainVerticle extends AbstractVerticle {
+public class MainVerticle {
 
-    @Override
-    public void start(Promise<Void> startPromise) {
+    public static void main(String[] args) {
+        Vertx vertx = Vertx.vertx();
         vertx.deployVerticle(new HttpVerticle());
         vertx.deployVerticle(new DatabaseVerticle());
     }
