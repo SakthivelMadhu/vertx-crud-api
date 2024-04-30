@@ -65,6 +65,58 @@ public class DatabaseService {
         });
     }
 
+
+
+    public void updateUser(JsonObject user) {
+        client.getConnection(connHandler -> {
+            if (connHandler.succeeded()) {
+                SqlConnection conn = connHandler.result();
+                // Execute the SQL statement to update the user
+                conn.preparedQuery("UPDATE user_info SET name = ?, email = ?, gender = ?, status = ? WHERE id = ?")
+                    .execute(Tuple.of(user.getString("name"), user.getString("email"), user.getString("gender"), user.getString("status"), user.getString("id")), ar -> {
+                        conn.close();
+                        if (ar.succeeded()) {
+                            // Send the updated status back to the HTTP verticle
+                            vertx.eventBus().send("http.response", new JsonObject()
+                                    .put("id", user.getString("id"))
+                                    .put("status", "SUCCESS"));
+                        } else {
+                            // Handle failure
+                            ar.cause().printStackTrace();
+                        }
+                    });
+            } else {
+                // Handle failure to obtain a connection
+                connHandler.cause().printStackTrace();
+            }
+        });
+    }
+    
+
+    public void deleteUser(JsonObject user) {
+        client.getConnection(connHandler -> {
+            if (connHandler.succeeded()) {
+                SqlConnection conn = connHandler.result();
+                // Execute the SQL statement to delete the user
+                conn.preparedQuery("DELETE FROM user_info WHERE id = ?")
+                    .execute(Tuple.of(user.getString("id")), ar -> {
+                        conn.close();
+                        if (ar.succeeded()) {
+                            // Send the updated status back to the HTTP verticle
+                            vertx.eventBus().send("http.response", new JsonObject()
+                                    .put("id", user.getString("id"))
+                                    .put("status", "SUCCESS"));
+                        } else {
+                            // Handle failure
+                            ar.cause().printStackTrace();
+                        }
+                    });
+            } else {
+                // Handle failure to obtain a connection
+                connHandler.cause().printStackTrace();
+            }
+        });
+    }
     
     
 

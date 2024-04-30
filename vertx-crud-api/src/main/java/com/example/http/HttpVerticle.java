@@ -14,7 +14,7 @@ public class HttpVerticle extends AbstractVerticle {
         router.post("/api/users").handler(new UserService(vertx)::createUser);
         router.get("/api/users").handler(new UserService(vertx)::getUsers);
         router.put("/api/users/:id").handler(new UserService(vertx)::updateUser);
-
+        router.delete("/api/users/:id").handler(new UserService(vertx)::deleteUser);
         // vertx.createHttpServer()
         //     .requestHandler(router)
         //     .listen(8080, http -> {
