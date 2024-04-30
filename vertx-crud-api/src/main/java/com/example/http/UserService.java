@@ -15,8 +15,9 @@ public class UserService {
     }
 
     public void createUser(RoutingContext routingContext) {
+        @SuppressWarnings("deprecation")
         JsonObject newUser = routingContext.getBodyAsJson();
-        vertx.eventBus().<JsonObject>request("database.save", newUser, reply -> {
+        vertx.eventBus().request("database.save", newUser, reply -> {
             if (reply.succeeded()) {
                 routingContext.response().setStatusCode(201)
                         .putHeader("content-type", "application/json")
@@ -57,6 +58,7 @@ public class UserService {
 
     public void updateUser(RoutingContext routingContext) {
         String userId = routingContext.request().getParam("id");
+        @SuppressWarnings("deprecation")
         JsonObject updatedUser = routingContext.getBodyAsJson().put("id", userId);
 
         vertx.eventBus().<JsonObject>request("database.update", updatedUser, reply -> {

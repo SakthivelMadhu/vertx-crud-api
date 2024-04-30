@@ -3,6 +3,7 @@
 This project demonstrates a simple CRUD (Create, Read, Update, Delete) API implementation using Vert.x, a reactive toolkit for building reactive applications on the JVM.
 
 ## Project Structure
+
 ```bash
 vertx-crud-api/
 ├── src/
@@ -33,10 +34,9 @@ vertx-crud-api/
 ├── README.md # Project documentation
 ```
 
+## project Explanation demo video
 
-## project Explanation demo video : 
-
-https://drive.google.com/file/d/1Z4z80P4Bi1SxMWs_cL84KOQhDTq6LH6L/view?usp=sharing
+<https://drive.google.com/file/d/1Z4z80P4Bi1SxMWs_cL84KOQhDTq6LH6L/view?usp=sharing>
 
 ## Overview
 
@@ -52,23 +52,24 @@ The project consists of the following components:
 To run the application locally, follow these steps:
 
 1. **Prerequisites**: Ensure you have Java Development Kit (JDK) 8 or higher installed on your system.
-2. **Database Setup**: 
+2. **Database Setup**:
    - Install PostgreSQL and create a database named `user_info`.
    - Update the database connection settings in the `application.properties` file.
-3. **Building the Project**:
+3.**Building the Project**:
+
 ```bash
 mvn clean package
 ```
 
-4. **Running the Application**:
+4.**Running the Application**
+
 ```bash
 java -jar target/vertx.jar
 ```
 
-5. **Accessing the API**: 
+5.**Accessing the API**
+
 - Once the application is running, you can access the API using `http://localhost:8080/api/users`.
-
-
 
 ## API Endpoints
 
