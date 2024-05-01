@@ -13,20 +13,29 @@ public class DatabaseVerticle extends AbstractVerticle {
     @Override
     public void start() {
         System.out.println("Starting database verticle...");
-        // Connect to the database and set up database service
+
         DatabaseService dbService = new DatabaseService(vertx, null);
         System.out.println("Starting database verticle1...");
 
         vertx.eventBus().consumer("database.save", message -> {
-            System.out.println("Starting database verticle2...");
             try {
                 LOGGER.info("Received message on address 'database.save'.");
-                dbService.createUser((JsonObject) message.body());
+                JsonObject user = (JsonObject) message.body();
+                dbService.createUser(user, resultHandler -> {
+                    if (resultHandler.succeeded()) {
+                        message.reply("User created successfully");
+                    } else {
+                        message.fail(500, resultHandler.cause().getMessage());
+                    }
+                });
             } catch (Exception e) {
                 LOGGER.error("Error processing message on address 'database.save': " + e.getMessage(), e);
-                // Handle the exception as needed, such as sending an error response or retrying the operation
+                message.fail(500, e.getMessage());
             }
         });
+        
+        
+        
 
         vertx.eventBus().consumer("database.update", message -> {
             try {
@@ -34,7 +43,7 @@ public class DatabaseVerticle extends AbstractVerticle {
                 dbService.updateUser((JsonObject) message.body());
             } catch (Exception e) {
                 LOGGER.error("Error processing message on address 'database.update': " + e.getMessage(), e);
-                // Handle the exception as needed
+                
             }
         });
 
@@ -44,7 +53,7 @@ public class DatabaseVerticle extends AbstractVerticle {
                 dbService.deleteUser((JsonObject) message.body());
             } catch (Exception e) {
                 LOGGER.error("Error processing message on address 'database.delete': " + e.getMessage(), e);
-                // Handle the exception as needed
+                
             }
         });
     }

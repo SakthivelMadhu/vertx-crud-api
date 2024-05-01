@@ -1,6 +1,8 @@
 package com.example.database;
 
 import io.vertx.sqlclient.Tuple;
+import io.vertx.core.AsyncResult;
+import io.vertx.core.Handler;
 import io.vertx.core.Vertx;
 import io.vertx.core.json.JsonObject;
 import io.vertx.jdbcclient.JDBCPool;
@@ -46,36 +48,74 @@ public class DatabaseService {
         return JDBCPool.pool(vertx, connectOptions, poolOptions);
     }
 
-    public void createUser(JsonObject user) {
+    public void createUser(JsonObject user , Handler<AsyncResult<Void>> resultHandler) {
+        System.out.println("Attempting to save user data...");
         client.getConnection(connHandler -> {
             if (connHandler.succeeded()) {
+                System.out.println("Database connection obtained successfully.");
                 SqlConnection conn = connHandler.result();
                 // Execute the SQL statement to save the user data
                 conn.preparedQuery("INSERT INTO user_infos (id, name, email, gender, status, timestamp) VALUES (?, ?, ?, ?, ?, CURRENT_TIMESTAMP)")
-                    .execute(Tuple.of(user.getString("id"), user.getString("name"), user.getString("email"), user.getString("gender"), user.getString("status")), ar -> {
-                        conn.close();
-                        if (ar.succeeded()) {
-                            // Send the updated status back to the HTTP verticle
-                            System.out.println("User datas are going... ");
-                            vertx.eventBus().send("database.save", new JsonObject()
-                                    .put("id", user.getString("id"))
-                                    .put("status", "SUCCESS"));
-                            System.out.println("User saved successfully: " + user.encode());
-                        } else {
-                            // Handle failure
-                            ar.cause().printStackTrace();
-                            System.err.println("Failed to save user: " + user.encode());
-                        }
-                    });
-            } else {
-                // Handle failure to obtain a connection
+                    .execute(Tuple.of(
+                        user.getString("id"), 
+                        user.getString("name"), 
+                        user.getString("email"), 
+                        user.getString("gender"), 
+                        user.getString("status")), 
+                        ar -> {
+                            conn.close();
+                            if (ar.succeeded()) {// Send the updated status back to the HTTP verticle
+                                System.out.println("Sending status update to HTTP verticle...");
+                                vertx.eventBus().send("database.save", new JsonObject()
+                                        .put("id", user.getString("id"))
+                                        .put("status", "SUCCESS"));
+                            } else {// Handle failure
+                                ar.cause().printStackTrace();
+                                System.err.println("Failed to save user data.");
+                            }
+                        });
+            } else {// Handle failure to obtain a connection
                 connHandler.cause().printStackTrace();
-                System.err.println("Failed to obtain database connection while saving user: " + user.encode());
+                System.err.println("Failed to obtain database connection.");
             }
         });
     }
+    
 
-
+    // public void createUser(JsonObject user) {
+    //     System.out.println("User000... ");
+    //     client.getConnection(connHandler -> {
+    //         System.out.println("User1111... ");
+    //         if (connHandler.succeeded()) {
+    //             SqlConnection conn = connHandler.result();
+    //             // Execute the SQL statement to save the user data
+    //             System.out.println("User2222 ");
+    //             conn.preparedQuery("INSERT INTO user_infos (id, name, email, gender, status, timestamp) VALUES (?, ?, ?, ?, ?, CURRENT_TIMESTAMP)")
+    //                 .execute(Tuple.of(user.getString("id"), user.getString("name"), user.getString("email"), user.getString("gender"), user.getString("status")), ar -> {
+    //                     conn.close();
+    //                     if (ar.succeeded()) {
+    //                         // Handle successful saving of user data within the same class
+    //                         handleUserSaveSuccess(user);
+    //                     } else {
+    //                         // Handle failure
+    //                         ar.cause().printStackTrace();
+    //                         System.err.println("Failed to save user: " + user.encode());
+    //                     }
+    //                 });
+    //         } else {
+    //             // Handle failure to obtain a connection
+    //             connHandler.cause().printStackTrace();
+    //             System.err.println("Failed to obtain database connection while saving user: " + user.encode());
+    //         }
+    //     });
+    // }
+    
+    // private void handleUserSaveSuccess(JsonObject user) {
+    //     // Send the updated status back to the HTTP verticle or perform any other necessary actions
+    //     System.out.println("User datas are going... ");
+    //     System.out.println("User saved successfully: " + user.encode());
+    // }
+    
 
     public void updateUser(JsonObject user) {
         client.getConnection(connHandler -> {
