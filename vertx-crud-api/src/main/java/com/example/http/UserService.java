@@ -14,22 +14,32 @@ public class UserService {
         this.vertx = vertx;
     }
 
+
+    @SuppressWarnings("deprecation")
     public void createUser(RoutingContext routingContext) {
-        @SuppressWarnings("deprecation")
         JsonObject newUser = routingContext.getBodyAsJson();
-        vertx.eventBus().request("database.save", newUser, reply -> {
-            if (reply.succeeded()) {
-                routingContext.response().setStatusCode(201)
-                        .putHeader("content-type", "application/json")
-                        .end(new JsonObject().put("status", "SUCCESS").encode());
-            } else {
-                routingContext.response().setStatusCode(500)
-                        .putHeader("content-type", "application/json")
-                        .end(new JsonObject().put("status", "FAILURE")
-                                .put("failure_reason", reply.cause().getMessage()).encode());
-            }
-        });
+        if (newUser == null) {
+            System.out.println("Sending message to address 'database.save'...");
+            vertx.eventBus().request("database.save", newUser, reply -> {
+                if (reply.succeeded()) {
+                    System.out.println("Received reply for 'database.save' request...");
+                    routingContext.response().setStatusCode(201)
+                            .putHeader("content-Type", "application/json")
+                            .end(new JsonObject().put("status", "SUCCESS").encode());
+                } else {
+                    System.out.println("Failed to receive reply for 'database.save' request...");
+                    routingContext.response().setStatusCode(500)
+                            .putHeader("content-type", "application/json")
+                            .end(new JsonObject().put("status", "FAILURE")
+                                    .put("failure_reason", reply.cause().getMessage()).encode());
+                }
+            });
+        } else {
+            System.out.println("Request body is null.");
+            routingContext.response().setStatusCode(400).end("Request body is required.");
+        }
     }
+
 
     public void getUsers(RoutingContext routingContext) {
         String name = routingContext.request().getParam("name");
@@ -41,13 +51,17 @@ public class UserService {
         if (gender != null) query.put("gender", gender);
         if (status != null) query.put("status", status);
 
+        System.out.println("getting message to address 'database.query...");
+
         vertx.eventBus().<JsonArray>request("database.query", query, reply -> {
             if (reply.succeeded()) {
+                System.out.println("received message to address 'database.query'...");
                 JsonArray users = reply.result().body();
                 routingContext.response().setStatusCode(200)
                         .putHeader("content-type", "application/json")
                         .end(users.encode());
             } else {
+                System.out.println("failed to receive replay message to address 'database.query'...");
                 routingContext.response().setStatusCode(500)
                         .putHeader("content-type", "application/json")
                         .end(new JsonObject().put("status", "FAILURE")
@@ -60,13 +74,15 @@ public class UserService {
         String userId = routingContext.request().getParam("id");
         @SuppressWarnings("deprecation")
         JsonObject updatedUser = routingContext.getBodyAsJson().put("id", userId);
-
+        System.out.println("updating message to address 'database.update'...");
         vertx.eventBus().<JsonObject>request("database.update", updatedUser, reply -> {
             if (reply.succeeded()) {
+                System.out.println("received updates message to address 'database.update'...");
                 routingContext.response().setStatusCode(200)
                         .putHeader("content-type", "application/json")
                         .end(new JsonObject().put("status", "SUCCESS").encode());
             } else {
+                System.out.println("failed to receive update message to address 'database.update'...");
                 routingContext.response().setStatusCode(500)
                         .putHeader("content-type", "application/json")
                         .end(new JsonObject().put("status", "FAILURE")
@@ -78,13 +94,15 @@ public class UserService {
     public void deleteUser(RoutingContext routingContext) {
         String userId = routingContext.request().getParam("id");
         JsonObject deleteUser = new JsonObject().put("id", userId);
-
+        System.out.println("deleting message to address 'database.delete'...");
         vertx.eventBus().<JsonObject>request("database.delete", deleteUser, reply -> {
             if (reply.succeeded()) {
+                System.out.println("received delete message to address 'database.delete'...");
                 routingContext.response().setStatusCode(200)
                         .putHeader("content-type", "application/json")
                         .end(new JsonObject().put("status", "SUCCESS").encode());
             } else {
+                System.out.println("failed to receive delete message to address 'database.delete'...");
                 routingContext.response().setStatusCode(500)
                         .putHeader("content-type", "application/json")
                         .end(new JsonObject().put("status", "FAILURE")
@@ -93,3 +111,4 @@ public class UserService {
         });
     }
 }
+
